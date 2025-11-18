@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { SemesterData, AttendanceRecord } from '@/types/attendance';
-
-const dataFilePath = path.join(process.cwd(), 'data', 'attendance.json');
+import { readAttendanceData, writeAttendanceData } from '@/lib/storage';
 
 // GET - Read attendance data
 export async function GET() {
   try {
-    const fileContents = await fs.readFile(dataFilePath, 'utf8');
-    const data = JSON.parse(fileContents);
+    const data = await readAttendanceData();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error reading attendance data:', error);
@@ -24,8 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // Read existing data
-    const fileContents = await fs.readFile(dataFilePath, 'utf8');
-    const existingData: SemesterData[] = JSON.parse(fileContents);
+    const existingData: SemesterData[] = await readAttendanceData();
 
     // Parse request body
     const body = await request.json();
@@ -75,12 +70,8 @@ export async function POST(request: NextRequest) {
       existingData.push(newSemester);
     }
 
-    // Write back to file
-    await fs.writeFile(
-      dataFilePath,
-      JSON.stringify(existingData, null, 2),
-      'utf8'
-    );
+    // Write back to storage
+    await writeAttendanceData(existingData);
 
     return NextResponse.json({
       success: true,
@@ -102,8 +93,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Read existing data
-    const fileContents = await fs.readFile(dataFilePath, 'utf8');
-    const existingData: SemesterData[] = JSON.parse(fileContents);
+    const existingData: SemesterData[] = await readAttendanceData();
 
     // Parse request body
     const body = await request.json();
@@ -150,11 +140,7 @@ export async function DELETE(request: NextRequest) {
         existingData.splice(semesterIndex, 1);
       }
 
-      await fs.writeFile(
-        dataFilePath,
-        JSON.stringify(existingData, null, 2),
-        'utf8'
-      );
+      await writeAttendanceData(existingData);
 
       return NextResponse.json({
         success: true,
@@ -164,11 +150,7 @@ export async function DELETE(request: NextRequest) {
       // Delete entire semester
       existingData.splice(semesterIndex, 1);
 
-      await fs.writeFile(
-        dataFilePath,
-        JSON.stringify(existingData, null, 2),
-        'utf8'
-      );
+      await writeAttendanceData(existingData);
 
       return NextResponse.json({
         success: true,

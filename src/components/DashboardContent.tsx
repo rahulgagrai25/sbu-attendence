@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { SemesterData } from '@/types/attendance';
 import StatsCard from './StatsCard';
 import SemesterChart from './SemesterChart';
@@ -16,17 +16,13 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
   const [attendanceData, setAttendanceData] = useState<SemesterData[]>(initialData);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Fetch latest data on mount
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/attendance');
       if (response.ok) {
         const data = await response.json();
+        // Data is already sorted by created_at (oldest first, newest at bottom)
         setAttendanceData(data);
       }
     } catch (error) {
@@ -34,7 +30,29 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // Fetch latest data on mount
+    fetchData();
+    
+    // Refresh data when window gains focus (user returns from admin page)
+    const handleFocus = () => {
+      fetchData();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    // Also set up periodic refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchData();
+    }, 30000);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+  }, [fetchData]);
 
   // Calculate overall statistics
   const totalConducted = attendanceData.reduce(
