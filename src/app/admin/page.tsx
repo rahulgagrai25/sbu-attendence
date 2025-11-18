@@ -31,11 +31,25 @@ export default function AdminPage() {
 
   const fetchAllSemesters = async () => {
     try {
-      const response = await fetch('/api/attendance');
-      const data: SemesterData[] = await response.json();
-      setAllSemesters(data);
+      // Add cache-busting to ensure fresh data
+      const response = await fetch(`/api/attendance?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      if (response.ok) {
+        const data: SemesterData[] = await response.json();
+        setAllSemesters(data);
+        console.log('✅ Admin panel data refreshed:', data.length, 'semesters');
+      } else {
+        const errorData = await response.json();
+        console.error('Error fetching semesters:', errorData);
+        setMessage({ type: 'error', text: errorData.error || 'Failed to fetch data' });
+      }
     } catch (error) {
       console.error('Error fetching semesters:', error);
+      setMessage({ type: 'error', text: 'Failed to fetch semester data' });
     }
   };
 
@@ -142,6 +156,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({ semester, records }),
       });
@@ -151,16 +166,25 @@ export default function AdminPage() {
       if (response.ok) {
         setMessage({ type: 'success', text: result.message });
         resetForm();
-        fetchAllSemesters();
+        // Immediately refresh the data
+        await fetchAllSemesters();
         setTimeout(() => {
           setActiveTab('manage');
           setMessage(null);
         }, 2000);
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to save data' });
+        setMessage({ 
+          type: 'error', 
+          text: result.error || result.details || 'Failed to save data' 
+        });
+        console.error('Save error:', result);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while saving data' });
+      console.error('Error saving data:', error);
+      setMessage({ 
+        type: 'error', 
+        text: `An error occurred while saving data: ${error instanceof Error ? error.message : String(error)}` 
+      });
     } finally {
       setLoading(false);
     }
@@ -176,6 +200,7 @@ export default function AdminPage() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({ semester: semesterName }),
       });
@@ -184,13 +209,22 @@ export default function AdminPage() {
 
       if (response.ok) {
         setMessage({ type: 'success', text: result.message });
-        fetchAllSemesters();
+        // Immediately refresh the data
+        await fetchAllSemesters();
         setTimeout(() => setMessage(null), 3000);
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to delete semester' });
+        setMessage({ 
+          type: 'error', 
+          text: result.error || result.details || 'Failed to delete semester' 
+        });
+        console.error('Delete error:', result);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while deleting semester' });
+      console.error('Error deleting semester:', error);
+      setMessage({ 
+        type: 'error', 
+        text: `An error occurred while deleting semester: ${error instanceof Error ? error.message : String(error)}` 
+      });
     }
   };
 
@@ -204,6 +238,7 @@ export default function AdminPage() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({ semester: semesterName, paperCode }),
       });
@@ -212,13 +247,22 @@ export default function AdminPage() {
 
       if (response.ok) {
         setMessage({ type: 'success', text: result.message });
-        fetchAllSemesters();
+        // Immediately refresh the data
+        await fetchAllSemesters();
         setTimeout(() => setMessage(null), 3000);
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to delete record' });
+        setMessage({ 
+          type: 'error', 
+          text: result.error || result.details || 'Failed to delete record' 
+        });
+        console.error('Delete record error:', result);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while deleting record' });
+      console.error('Error deleting record:', error);
+      setMessage({ 
+        type: 'error', 
+        text: `An error occurred while deleting record: ${error instanceof Error ? error.message : String(error)}` 
+      });
     }
   };
 

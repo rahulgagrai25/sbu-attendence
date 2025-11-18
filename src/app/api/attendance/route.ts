@@ -6,11 +6,16 @@ import { readAttendanceData, writeAttendanceData } from '@/lib/storage';
 export async function GET() {
   try {
     const data = await readAttendanceData();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
   } catch (error) {
     console.error('Error reading attendance data:', error);
     return NextResponse.json(
-      { error: 'Failed to read attendance data' },
+      { error: 'Failed to read attendance data', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -79,11 +84,18 @@ export async function POST(request: NextRequest) {
         ? 'Semester updated successfully'
         : 'Semester added successfully',
       data: newSemester,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
     });
   } catch (error) {
     console.error('Error writing attendance data:', error);
     return NextResponse.json(
-      { error: 'Failed to save attendance data' },
+      { 
+        error: 'Failed to save attendance data',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
@@ -145,6 +157,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Record deleted successfully',
+      }, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
       });
     } else {
       // Delete entire semester
@@ -155,12 +171,19 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Semester deleted successfully',
+      }, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
       });
     }
   } catch (error) {
     console.error('Error deleting attendance data:', error);
     return NextResponse.json(
-      { error: 'Failed to delete attendance data' },
+      { 
+        error: 'Failed to delete attendance data',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }

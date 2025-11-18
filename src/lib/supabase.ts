@@ -14,7 +14,21 @@ const TABLE_NAME = 'attendance_data';
 
 // Check if Supabase is configured
 export function isSupabaseConfigured(): boolean {
-  return !!supabase && !!supabaseUrl && !!supabaseAnonKey;
+  const hasUrl = !!supabaseUrl && supabaseUrl.length > 0;
+  const hasKey = !!supabaseAnonKey && supabaseAnonKey.length > 0;
+  const isConfigured = hasUrl && hasKey && !!supabase;
+  
+  if (!isConfigured && (hasUrl || hasKey)) {
+    // Only log warning if partially configured (helps with debugging)
+    console.warn('Supabase partially configured:', {
+      hasUrl,
+      hasKey,
+      urlLength: supabaseUrl.length,
+      keyLength: supabaseAnonKey.length,
+    });
+  }
+  
+  return isConfigured;
 }
 
 // Database types
@@ -125,12 +139,18 @@ export async function writeAttendanceDataToSupabase(
       .upsert(rows, {
         onConflict: 'semester',
         ignoreDuplicates: false,
-      });
+      })
+      .select();
 
     if (upsertError) {
-      console.error('Error upserting data:', upsertError);
+      console.error('Error upserting data to Supabase:', upsertError);
+      console.error('Error code:', upsertError.code);
+      console.error('Error message:', upsertError.message);
+      console.error('Error details:', upsertError.details);
       throw upsertError;
     }
+    
+    console.log('✅ Successfully upserted', rows.length, 'semesters to Supabase');
   } catch (error) {
     console.error('Error writing attendance data to Supabase:', error);
     throw error;

@@ -43,15 +43,16 @@ export async function readAttendanceData(): Promise<SemesterData[]> {
   if (isSupabaseConfigured()) {
     try {
       const data = await readAttendanceDataFromSupabase();
-      if (data && data.length > 0) {
-        // Update memory storage as backup
-        memoryStorage = data;
-        return data;
-      }
+      // Update memory storage as backup
+      memoryStorage = data;
+      console.log('✅ Successfully read from Supabase:', data.length, 'semesters');
+      return data; // Return even if empty array
     } catch (error) {
-      console.error('Error reading from Supabase, falling back to file system:', error);
+      console.error('❌ Error reading from Supabase, falling back to file system:', error);
       // Fall through to file system
     }
+  } else {
+    console.log('⚠️ Supabase not configured, using file system');
   }
 
   // Try to read from file system (works for reads even in serverless)
@@ -98,11 +99,18 @@ export async function writeAttendanceData(data: SemesterData[]): Promise<void> {
   if (isSupabaseConfigured()) {
     try {
       await writeAttendanceDataToSupabase(data);
+      console.log('✅ Successfully wrote to Supabase:', data.length, 'semesters');
       return; // Success - no need to write to file
     } catch (error) {
-      console.error('Error writing to Supabase, falling back to file system:', error);
+      console.error('❌ Error writing to Supabase, falling back to file system:', error);
+      // Log the full error for debugging
+      if (error instanceof Error) {
+        console.error('Error details:', error.message, error.stack);
+      }
       // Fall through to file system
     }
+  } else {
+    console.log('⚠️ Supabase not configured, using file system');
   }
 
   // Try file system (only works on regular servers, not serverless)

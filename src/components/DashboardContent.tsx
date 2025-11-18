@@ -19,11 +19,21 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/attendance');
+      // Add cache-busting to ensure fresh data
+      const response = await fetch(`/api/attendance?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         // Data is already sorted by created_at (oldest first, newest at bottom)
         setAttendanceData(data);
+        console.log('✅ Dashboard data refreshed:', data.length, 'semesters');
+      } else {
+        const errorData = await response.json();
+        console.error('Error fetching attendance data:', errorData);
       }
     } catch (error) {
       console.error('Error fetching attendance data:', error);
