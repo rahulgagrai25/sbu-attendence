@@ -1,36 +1,23 @@
 import Image from 'next/image';
-import { attendanceData, studentInfo } from '@/data/attendanceData';
-import StatsCard from '@/components/StatsCard';
-import SemesterChart from '@/components/SemesterChart';
-import AttendanceTrendChart from '@/components/AttendanceTrendChart';
-import PresentAbsentChart from '@/components/PresentAbsentChart';
-import SemesterTable from '@/components/SemesterTable';
+import { studentInfo } from '@/data/attendanceData';
+import DashboardContent from '@/components/DashboardContent';
+import { SemesterData } from '@/types/attendance';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-export default function Home() {
-  // Calculate overall statistics
-  const totalConducted = attendanceData.reduce(
-    (sum, sem) => sum + sem.records.reduce((s, r) => s + r.conducted, 0),
-    0
-  );
-  const totalPresent = attendanceData.reduce(
-    (sum, sem) => sum + sem.records.reduce((s, r) => s + r.present, 0),
-    0
-  );
-  const totalAbsent = attendanceData.reduce(
-    (sum, sem) => sum + sem.records.reduce((s, r) => s + r.absent, 0),
-    0
-  );
-  const overallAttendance = (totalPresent / totalConducted) * 100;
-  
-  // Calculate average attendance across all subjects
-  const allAttendances = attendanceData.flatMap(sem => 
-    sem.records.map(r => r.attendancePercent)
-  );
-  const avgAttendance = allAttendances.reduce((sum, a) => sum + a, 0) / allAttendances.length;
+async function getAttendanceData(): Promise<SemesterData[]> {
+  try {
+    const dataFilePath = path.join(process.cwd(), 'data', 'attendance.json');
+    const fileContents = await fs.readFile(dataFilePath, 'utf8');
+    return JSON.parse(fileContents);
+  } catch (error) {
+    console.error('Error reading attendance data:', error);
+    return [];
+  }
+}
 
-  // Count subjects with good attendance (>= 75%)
-  const goodAttendanceCount = allAttendances.filter(a => a >= 75).length;
-  const totalSubjects = allAttendances.length;
+export default async function Home() {
+  const initialData = await getAttendanceData();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -86,68 +73,21 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-10">
         {/* Page Title Section */}
         <div className="mb-6 sm:mb-8">
-          <div className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-md">
-            <h2 className="text-lg sm:text-xl font-bold">Academic Performance Overview</h2>
-          </div>
-        </div>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 mb-6 sm:mb-8 lg:mb-10">
-          <StatsCard
-            title="Overall Attendance"
-            value={`${overallAttendance.toFixed(2)}%`}
-            subtitle={`${totalPresent} present out of ${totalConducted} classes`}
-            trend={overallAttendance >= 75 ? 'up' : overallAttendance >= 60 ? 'neutral' : 'down'}
-          />
-          <StatsCard
-            title="Average Attendance"
-            value={`${avgAttendance.toFixed(2)}%`}
-            subtitle="Across all subjects"
-            trend={avgAttendance >= 75 ? 'up' : avgAttendance >= 60 ? 'neutral' : 'down'}
-          />
-          <StatsCard
-            title="Total Classes"
-            value={totalConducted}
-            subtitle={`${totalPresent} present, ${totalAbsent} absent`}
-          />
-          <StatsCard
-            title="Subjects Status"
-            value={`${goodAttendanceCount}/${totalSubjects}`}
-            subtitle="Subjects with ≥75% attendance"
-            trend={goodAttendanceCount / totalSubjects >= 0.75 ? 'up' : 'neutral'}
-          />
-        </div>
-
-        {/* Charts Section */}
-        <div className="mb-6 sm:mb-8 lg:mb-10">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-t-lg shadow-md">
-            <h2 className="text-lg sm:text-xl font-bold">Visual Analytics</h2>
-          </div>
-          <div className="bg-white rounded-b-lg shadow-lg p-4 sm:p-6 border-l-4 border-blue-600">
-            {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-              <SemesterChart data={attendanceData} />
-              <PresentAbsentChart data={attendanceData} />
+          <div className="flex justify-between items-center">
+            <div className="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg shadow-md">
+              <h2 className="text-lg sm:text-xl font-bold">Academic Performance Overview</h2>
             </div>
-
-            {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:gap-6">
-              <AttendanceTrendChart data={attendanceData} />
-            </div>
+            {/* Admin Panel button */}
+            {/* <a
+              href="/admin"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold shadow-md"
+            >
+              Admin Panel
+            </a> */}
           </div>
         </div>
 
-        {/* Semester Breakdown Tables */}
-        <div className="space-y-4 sm:space-y-5 lg:space-y-6">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-t-lg shadow-md">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold">Semester-wise Detailed Breakdown</h2>
-          </div>
-          <div className="bg-white rounded-b-lg shadow-lg p-4 sm:p-6 border-l-4 border-blue-600 space-y-4 sm:space-y-5 lg:space-y-6">
-            {attendanceData.map((semesterData) => (
-              <SemesterTable key={semesterData.semester} semesterData={semesterData} />
-            ))}
-          </div>
-        </div>
+        <DashboardContent initialData={initialData} />
       </main>
 
       {/* Footer */}
@@ -163,9 +103,9 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-bold mb-3 text-blue-300">Quick Links</h3>
               <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Student Portal</a></li>
+                <li><a href="/" className="hover:text-blue-300 transition-colors">Dashboard</a></li>
+                <li><a href="/admin" className="hover:text-blue-300 transition-colors">Admin Panel</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Academic Records</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Dashboard</a></li>
               </ul>
             </div>
             <div>

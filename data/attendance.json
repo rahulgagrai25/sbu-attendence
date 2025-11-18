@@ -1,0 +1,161 @@
+[
+  {
+    "semester": "SEMESTER I",
+    "records": [
+      {
+        "paperCode": "BBA-101",
+        "subject": "Principles of Management",
+        "batchCode": "D",
+        "conducted": 30,
+        "present": 17,
+        "absent": 13,
+        "attendancePercent": 56.67
+      },
+      {
+        "paperCode": "BBA-102",
+        "subject": "Financial Accounting",
+        "batchCode": "D",
+        "conducted": 36,
+        "present": 22,
+        "absent": 14,
+        "attendancePercent": 61.11
+      },
+      {
+        "paperCode": "BBA-103",
+        "subject": "Business Economics",
+        "batchCode": "D",
+        "conducted": 36,
+        "present": 23,
+        "absent": 13,
+        "attendancePercent": 63.89
+      },
+      {
+        "paperCode": "BBA-104",
+        "subject": "Business Communications",
+        "batchCode": "D",
+        "conducted": 29,
+        "present": 16,
+        "absent": 13,
+        "attendancePercent": 55.17
+      },
+      {
+        "paperCode": "BBA-105",
+        "subject": "Business Statistics",
+        "batchCode": "D",
+        "conducted": 36,
+        "present": 21,
+        "absent": 15,
+        "attendancePercent": 58.33
+      }
+    ]
+  },
+  {
+    "semester": "SEMESTER II",
+    "records": [
+      {
+        "paperCode": "BBA-201",
+        "subject": "Organisation Behaviour",
+        "batchCode": "D",
+        "conducted": 6,
+        "present": 5,
+        "absent": 1,
+        "attendancePercent": 83.33
+      },
+      {
+        "paperCode": "BBA-202",
+        "subject": "Marketing Management",
+        "batchCode": "D",
+        "conducted": 50,
+        "present": 49,
+        "absent": 1,
+        "attendancePercent": 98
+      },
+      {
+        "paperCode": "BBA-203",
+        "subject": "Business Environment",
+        "batchCode": "D",
+        "conducted": 33,
+        "present": 26,
+        "absent": 7,
+        "attendancePercent": 78.79
+      },
+      {
+        "paperCode": "BBA-204",
+        "subject": "Financial Management",
+        "batchCode": "D",
+        "conducted": 39,
+        "present": 28,
+        "absent": 11,
+        "attendancePercent": 71.79
+      },
+      {
+        "paperCode": "BBA-206P",
+        "subject": "Fundamentals of Computer Application",
+        "batchCode": "D",
+        "conducted": 20,
+        "present": 14,
+        "absent": 6,
+        "attendancePercent": 70
+      }
+    ]
+  },
+  {
+    "semester": "SEMESTER III",
+    "records": [
+      {
+        "paperCode": "BBA-301",
+        "subject": "Business Law",
+        "batchCode": "D",
+        "conducted": 19,
+        "present": 15,
+        "absent": 4,
+        "attendancePercent": 78.95
+      },
+      {
+        "paperCode": "BBA-302",
+        "subject": "Cost and Management Accounting",
+        "batchCode": "D",
+        "conducted": 40,
+        "present": 32,
+        "absent": 8,
+        "attendancePercent": 80
+      },
+      {
+        "paperCode": "BBA-303",
+        "subject": "Introduction to Digital Marketing",
+        "batchCode": "D",
+        "conducted": 32,
+        "present": 26,
+        "absent": 6,
+        "attendancePercent": 81.25
+      },
+      {
+        "paperCode": "BBA-304",
+        "subject": "Human Resource Management",
+        "batchCode": "D",
+        "conducted": 34,
+        "present": 27,
+        "absent": 7,
+        "attendancePercent": 79.41
+      },
+      {
+        "paperCode": "BBA-305",
+        "subject": "Production and Operation Management",
+        "batchCode": "D",
+        "conducted": 30,
+        "present": 24,
+        "absent": 6,
+        "attendancePercent": 80
+      },
+      {
+        "paperCode": "BBA-306P",
+        "subject": "Tally Lab-I",
+        "batchCode": "D",
+        "conducted": 6,
+        "present": 6,
+        "absent": 0,
+        "attendancePercent": 100
+      }
+    ]
+  }
+]
