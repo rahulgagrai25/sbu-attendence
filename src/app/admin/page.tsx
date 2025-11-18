@@ -31,25 +31,11 @@ export default function AdminPage() {
 
   const fetchAllSemesters = async () => {
     try {
-      // Add cache-busting to ensure fresh data
-      const response = await fetch(`/api/attendance?t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-      if (response.ok) {
-        const data: SemesterData[] = await response.json();
-        setAllSemesters(data);
-        console.log('✅ Admin panel data refreshed:', data.length, 'semesters');
-      } else {
-        const errorData = await response.json();
-        console.error('Error fetching semesters:', errorData);
-        setMessage({ type: 'error', text: errorData.error || 'Failed to fetch data' });
-      }
+      const response = await fetch('/api/attendance');
+      const data: SemesterData[] = await response.json();
+      setAllSemesters(data);
     } catch (error) {
       console.error('Error fetching semesters:', error);
-      setMessage({ type: 'error', text: 'Failed to fetch semester data' });
     }
   };
 
@@ -156,7 +142,6 @@ export default function AdminPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({ semester, records }),
       });
@@ -166,25 +151,21 @@ export default function AdminPage() {
       if (response.ok) {
         setMessage({ type: 'success', text: result.message });
         resetForm();
-        // Immediately refresh the data
+        // Refresh the list immediately
         await fetchAllSemesters();
         setTimeout(() => {
           setActiveTab('manage');
           setMessage(null);
         }, 2000);
       } else {
+        const errorMsg = result.error || 'Failed to save data';
         setMessage({ 
           type: 'error', 
-          text: result.error || result.details || 'Failed to save data' 
+          text: `${errorMsg}. Please check your Supabase configuration and deployment logs.` 
         });
-        console.error('Save error:', result);
       }
     } catch (error) {
-      console.error('Error saving data:', error);
-      setMessage({ 
-        type: 'error', 
-        text: `An error occurred while saving data: ${error instanceof Error ? error.message : String(error)}` 
-      });
+      setMessage({ type: 'error', text: 'An error occurred while saving data' });
     } finally {
       setLoading(false);
     }
@@ -200,7 +181,6 @@ export default function AdminPage() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({ semester: semesterName }),
       });
@@ -209,22 +189,17 @@ export default function AdminPage() {
 
       if (response.ok) {
         setMessage({ type: 'success', text: result.message });
-        // Immediately refresh the data
         await fetchAllSemesters();
         setTimeout(() => setMessage(null), 3000);
       } else {
+        const errorMsg = result.error || 'Failed to delete semester';
         setMessage({ 
           type: 'error', 
-          text: result.error || result.details || 'Failed to delete semester' 
+          text: `${errorMsg}. Please check your Supabase configuration.` 
         });
-        console.error('Delete error:', result);
       }
     } catch (error) {
-      console.error('Error deleting semester:', error);
-      setMessage({ 
-        type: 'error', 
-        text: `An error occurred while deleting semester: ${error instanceof Error ? error.message : String(error)}` 
-      });
+      setMessage({ type: 'error', text: 'An error occurred while deleting semester' });
     }
   };
 
@@ -238,7 +213,6 @@ export default function AdminPage() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify({ semester: semesterName, paperCode }),
       });
@@ -247,22 +221,17 @@ export default function AdminPage() {
 
       if (response.ok) {
         setMessage({ type: 'success', text: result.message });
-        // Immediately refresh the data
         await fetchAllSemesters();
         setTimeout(() => setMessage(null), 3000);
       } else {
+        const errorMsg = result.error || 'Failed to delete record';
         setMessage({ 
           type: 'error', 
-          text: result.error || result.details || 'Failed to delete record' 
+          text: `${errorMsg}. Please check your Supabase configuration.` 
         });
-        console.error('Delete record error:', result);
       }
     } catch (error) {
-      console.error('Error deleting record:', error);
-      setMessage({ 
-        type: 'error', 
-        text: `An error occurred while deleting record: ${error instanceof Error ? error.message : String(error)}` 
-      });
+      setMessage({ type: 'error', text: 'An error occurred while deleting record' });
     }
   };
 

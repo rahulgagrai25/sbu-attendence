@@ -43,16 +43,14 @@ export async function readAttendanceData(): Promise<SemesterData[]> {
   if (isSupabaseConfigured()) {
     try {
       const data = await readAttendanceDataFromSupabase();
-      // Update memory storage as backup
+      // Update memory storage as backup (even if empty)
       memoryStorage = data;
-      console.log('✅ Successfully read from Supabase:', data.length, 'semesters');
       return data; // Return even if empty array
-    } catch (error) {
-      console.error('❌ Error reading from Supabase, falling back to file system:', error);
+    } catch (error: any) {
+      console.error('Error reading from Supabase:', error?.message || error);
+      console.error('Falling back to file system or memory storage');
       // Fall through to file system
     }
-  } else {
-    console.log('⚠️ Supabase not configured, using file system');
   }
 
   // Try to read from file system (works for reads even in serverless)
@@ -99,18 +97,18 @@ export async function writeAttendanceData(data: SemesterData[]): Promise<void> {
   if (isSupabaseConfigured()) {
     try {
       await writeAttendanceDataToSupabase(data);
-      console.log('✅ Successfully wrote to Supabase:', data.length, 'semesters');
+      console.log('Successfully wrote to Supabase');
       return; // Success - no need to write to file
-    } catch (error) {
-      console.error('❌ Error writing to Supabase, falling back to file system:', error);
-      // Log the full error for debugging
-      if (error instanceof Error) {
-        console.error('Error details:', error.message, error.stack);
+    } catch (error: any) {
+      console.error('Error writing to Supabase:', error?.message || error);
+      console.error('Error details:', error);
+      // In production/serverless, we must use Supabase - throw error
+      if (isServerless) {
+        throw new Error(`Failed to write to Supabase: ${error?.message || 'Unknown error'}. Please check your Supabase configuration.`);
       }
-      // Fall through to file system
+      // In development, allow fallback to file system
+      console.warn('Supabase write failed, falling back to file system');
     }
-  } else {
-    console.log('⚠️ Supabase not configured, using file system');
   }
 
   // Try file system (only works on regular servers, not serverless)

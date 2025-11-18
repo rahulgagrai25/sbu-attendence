@@ -4,11 +4,10 @@
 -- Create the attendance_data table
 CREATE TABLE IF NOT EXISTS attendance_data (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  semester TEXT NOT NULL,
+  semester TEXT NOT NULL UNIQUE,
   records JSONB NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  CONSTRAINT unique_semester UNIQUE (semester)
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create an index on semester for faster lookups
