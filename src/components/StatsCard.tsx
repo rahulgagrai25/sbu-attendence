@@ -14,18 +14,24 @@ export default function StatsCard({ title, value, subtitle, icon, trend }: Stats
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 border-l-4 border-blue-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-xs sm:text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wide">{title}</p>
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            {value}
+          </p>
           {subtitle && (
-            <p className={`text-xs sm:text-sm mt-1 sm:mt-2 ${trend ? trendColors[trend] : 'text-gray-500'}`}>
+            <p className={`text-xs sm:text-sm mt-2 ${trend ? trendColors[trend] : 'text-gray-500'}`}>
               {subtitle}
             </p>
           )}
         </div>
-        {icon && <div className="text-3xl sm:text-4xl text-blue-500">{icon}</div>}
+        {icon && (
+          <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full p-3 text-blue-600">
+            <div className="text-2xl sm:text-3xl">{icon}</div>
+          </div>
+        )}
       </div>
     </div>
   );

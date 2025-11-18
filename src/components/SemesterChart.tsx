@@ -24,8 +24,11 @@ export default function SemesterChart({ data }: SemesterChartProps) {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6 border border-gray-200">
-      <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-800 mb-2 sm:mb-3 lg:mb-4">Attendance by Semester</h3>
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 border-l-4 border-blue-600">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-1 h-6 bg-gradient-to-b from-blue-600 to-indigo-600 rounded"></div>
+        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-800">Attendance by Semester</h3>
+      </div>
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />

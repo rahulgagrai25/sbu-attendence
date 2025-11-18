@@ -12,3 +12,11 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* College website styling */
+:root {
+  --college-primary: #1e3a8a;
+  --college-secondary: #1e40af;
+  --college-accent: #3b82f6;
+  --college-dark: #1e293b;
+}
